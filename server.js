@@ -3,100 +3,124 @@ import cors from "cors";
 import { chromium } from "playwright";
 
 const app = express();
+
 app.use(cors({ origin: "*" }));
 
 let browser;
+
+const CACHE = new Map();
+const CACHE_TTL = 60 * 1000;
 
 async function getBrowser() {
   if (!browser) {
     browser = await chromium.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-sync",
+        "--disable-default-apps"
+      ]
     });
   }
+
   return browser;
 }
 
-function lines(text) {
-  return text.split("\n").map(x => x.trim()).filter(Boolean);
+function cleanText(text) {
+  return String(text || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+}
+
+function getLines(text) {
+  return cleanText(text)
+    .split("\n")
+    .map(x => x.trim())
+    .filter(Boolean);
 }
 
 function extractName(text, id) {
-  for (const line of lines(text)) {
+  const allLines = getLines(text);
+
+  for (const line of allLines) {
     if (line.includes(`ID: ${id}`)) {
-      return line.split("ID:")[0].trim();
+      const name = line.split("ID:")[0].trim();
+      if (name && name.length < 50) return name;
     }
   }
+
+  const inline = cleanText(text).match(new RegExp(`(?:Controls\\s+)?(.{1,40}?)\\s+ID:\\s*${id}`));
+  if (inline && inline[1]) {
+    return inline[1]
+      .replace(/About Us|Contribute Songs|Media Resources|Parental Controls/gi, "")
+      .trim();
+  }
+
   return "";
 }
 
-function extractCharm(text) {
-  const m = text.match(/Charm\s*:\s*([0-9]+)/i);
-  return m ? m[1] : "";
-}
-
 function extractMaskedEmail(text) {
-  const m = text.match(/[a-zA-Z0-9._%+-]*\*+[a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  return m ? m[0] : "";
-}
-
-function extractPaymentMethods(text) {
-  const methods = ["VISA", "mastercard", "DISCOVER", "Diners", "AMEX", "UPI by UniPin", "PayPal"];
-  return methods.filter(m => text.toLowerCase().includes(m.toLowerCase()));
+  const match = cleanText(text).match(/[a-zA-Z0-9._%+-]*\*{3,}[a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  return match ? match[0] : "";
 }
 
 function extractPackages(text) {
-  const found = [];
-  const regex = /(\d+(?:K)?\s*Gold)\s*₹\s?(\d+)/gi;
-  let m;
+  const flat = cleanText(text);
+  const packages = [];
 
-  while ((m = regex.exec(text)) !== null) {
-    found.push({
-      pack: m[1],
-      price: `₹${m[2]}`
+  const packRegex = /((?:\d+(?:K)?|\d{1,6})\s*Gold)\s*₹\s?(\d+)/gi;
+  let match;
+
+  while ((match = packRegex.exec(flat)) !== null) {
+    const pack = match[1].replace(/\s+/g, " ").trim();
+    const price = `₹${match[2]}`;
+
+    const start = Math.max(0, match.index - 80);
+    const end = Math.min(flat.length, match.index + match[0].length + 80);
+    const nearby = flat.slice(start, end);
+
+    const bonusMatch =
+      nearby.match(/\+\s*([0-9]+)\s*(?:bonus\s*)?Gold/i) ||
+      nearby.match(/extra\s*Gold\s*[:\-]?\s*([0-9]+)/i);
+
+    packages.push({
+      pack,
+      price,
+      extraGold: bonusMatch ? bonusMatch[1] : "",
+      hasOffer: !!bonusMatch
     });
   }
 
-  const knownPacks = [
-    "300 Gold", "600 Gold", "3000 Gold", "10000 Gold",
-    "50000 Gold", "100K Gold", "250K Gold", "500K Gold"
-  ];
+  const unique = [];
+  const seen = new Set();
 
-  if (!found.length) {
-    for (const p of knownPacks) {
-      const priceMatch = text.match(new RegExp(`${p.replace("K", "K")}\\s*₹\\s?(\\d+)`, "i"));
-      if (priceMatch) found.push({ pack: p, price: `₹${priceMatch[1]}` });
+  for (const p of packages) {
+    const key = `${p.pack}-${p.price}-${p.extraGold}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(p);
     }
   }
 
-  return found;
+  return unique;
 }
 
-async function getImages(page) {
-  return await page.locator("img").evaluateAll(imgs =>
-    imgs.map(img => ({
-      src: img.src || "",
-      alt: img.alt || "",
-      width: img.naturalWidth || 0,
-      height: img.naturalHeight || 0
-    })).filter(x => x.src)
-  ).catch(() => []);
+function extractCharm(text) {
+  const match = cleanText(text).match(/Charm\s*:\s*([0-9]+)/i);
+  return match ? match[1] : "";
 }
 
 function pickAvatar(images) {
   return (
-    images.find(x => x.src.includes("picuser"))?.src ||
-    images.find(x => x.src.includes("header"))?.src ||
-    images.find(x => x.src.includes("avatar"))?.src ||
-    ""
-  );
-}
-
-function pickPossibleCharmIcon(images) {
-  return (
-    images.find(x => x.src.toLowerCase().includes("charm"))?.src ||
-    images.find(x => x.src.toLowerCase().includes("vip"))?.src ||
-    images.find(x => x.src.toLowerCase().includes("badge"))?.src ||
+    images.find(src => src.includes("picuser")) ||
+    images.find(src => src.includes("/header/")) ||
+    images.find(src => src.toLowerCase().includes("avatar")) ||
     ""
   );
 }
@@ -105,7 +129,15 @@ app.get("/", async (req, res) => {
   const id = String(req.query.id || "").trim();
 
   if (!id) {
-    return res.json({ success: false, message: "Please provide id" });
+    return res.json({
+      success: false,
+      message: "Please provide id"
+    });
+  }
+
+  const cached = CACHE.get(id);
+  if (cached && Date.now() - cached.time < CACHE_TTL) {
+    return res.json(cached.data);
   }
 
   let page;
@@ -119,49 +151,88 @@ app.get("/", async (req, res) => {
       viewport: { width: 390, height: 844 }
     });
 
+    await page.route("**/*", route => {
+      const type = route.request().resourceType();
+
+      if (["font", "media"].includes(type)) {
+        return route.abort();
+      }
+
+      return route.continue();
+    });
+
     const url = `https://weplayapp.com/recharge?id=${encodeURIComponent(id)}`;
 
-    await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
-    await page.waitForTimeout(6000);
+    await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000
+    });
 
-    const visibleText = await page.locator("body").innerText().catch(() => "");
-    const allLines = lines(visibleText);
-    const images = await getImages(page);
+    await page.waitForFunction(
+      userId => document.body && document.body.innerText.includes(userId),
+      id,
+      { timeout: 12000 }
+    ).catch(() => {});
+
+    await page.waitForTimeout(1500);
+
+    const dataFromPage = await page.evaluate(userId => {
+      const text = document.body ? document.body.innerText : "";
+
+      const images = Array.from(document.images)
+        .map(img => img.src)
+        .filter(Boolean);
+
+      return {
+        text,
+        images
+      };
+    }, id);
+
+    const visibleText = dataFromPage.text || "";
+    const images = dataFromPage.images || [];
 
     const notFound =
       visibleText.toLowerCase().includes("user doesn't exist") ||
       visibleText.toLowerCase().includes("user does not exist");
 
     if (notFound) {
-      return res.json({ success: false, id, message: "User not found" });
+      const result = {
+        success: false,
+        id,
+        message: "User not found"
+      };
+
+      CACHE.set(id, { time: Date.now(), data: result });
+      return res.json(result);
     }
 
-    const data = {
+    const result = {
       success: true,
       id,
-      url,
       name: extractName(visibleText, id),
+      avatar: pickAvatar(images),
       charm: extractCharm(visibleText),
       maskedEmail: extractMaskedEmail(visibleText),
-      avatar: pickAvatar(images),
-      possibleCharmIcon: pickPossibleCharmIcon(images),
       packages: extractPackages(visibleText),
-      paymentMethods: extractPaymentMethods(visibleText),
-      images,
-      visibleLines: allLines,
-      visibleText
+      url,
+      fetchedAt: new Date().toISOString()
     };
 
-    return res.json(data);
+    CACHE.set(id, { time: Date.now(), data: result });
+
+    return res.json(result);
   } catch (error) {
     return res.json({
       success: false,
       id,
-      message: "Playwright fetch failed",
+      message: "Fetch failed",
       error: error.message
     });
   } finally {
-    if (page) await page.close().catch(() => {});
+    if (page) {
+      await page.close().catch(() => {});
+    }
   }
 });
 
