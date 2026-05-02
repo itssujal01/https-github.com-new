@@ -1,18 +1,16 @@
-const express = require("express");
-const axios = require("axios");
+import express from "express";
+import axios from "axios";
+
 const app = express();
 
-// Root check
 app.get("/", (req, res) => {
   res.send("API is running 🚀");
 });
 
-// Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// ✅ MAIN FETCH API
 app.get("/fetch", async (req, res) => {
   try {
     const id = req.query.id;
@@ -24,8 +22,6 @@ app.get("/fetch", async (req, res) => {
       });
     }
 
-    // 🔥 Example external fetch (abhi dummy hai)
-    // yahan baad me real data fetch karenge
     const userData = {
       id: id,
       name: "Demo User",
@@ -48,7 +44,6 @@ app.get("/fetch", async (req, res) => {
   }
 });
 
-// Server start
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
