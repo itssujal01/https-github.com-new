@@ -17,16 +17,24 @@ app.get("/check", async (req, res) => {
   const id = String(req.query.id || "").trim();
 
   if (!/^[0-9]{4,15}$/.test(id)) {
-    return res.json({ success: false, error: "Invalid ID" });
+    return res.json({
+      success: false,
+      error: "Invalid ID"
+    });
   }
 
-  const url = `https://weplayapp.com/recharge?id=${id}`;
+  const url = `https://weplayapp.com/recharge?id=${encodeURIComponent(id)}`;
   let browser;
 
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
+      ]
     });
 
     const page = await browser.newPage({
@@ -35,20 +43,25 @@ app.get("/check", async (req, res) => {
         "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
     });
 
-    await page.goto(url, { waitUntil: "networkidle", timeout: 45000 });
+    await page.goto(url, {
+      waitUntil: "networkidle",
+      timeout: 45000
+    });
+
     await page.waitForTimeout(5000);
 
-    const bodyText = await page.locator("body").innerText().catch(() => "");
+    const visibleText = await page.locator("body").innerText().catch(() => "");
 
     const images = await page.$$eval("img", imgs =>
-      imgs.map(img => ({
-        src: img.src || "",
-        alt: img.alt || "",
-        width: img.naturalWidth || 0,
-        height: img.naturalHeight || 0
-      }))
-      .filter(i => i.src)
-      .slice(0, 20)
+      imgs
+        .map(img => ({
+          src: img.src || "",
+          alt: img.alt || "",
+          width: img.naturalWidth || 0,
+          height: img.naturalHeight || 0
+        }))
+        .filter(img => img.src)
+        .slice(0, 30)
     );
 
     await browser.close();
@@ -57,23 +70,25 @@ app.get("/check", async (req, res) => {
       success: true,
       id,
       url,
-      visibleText: cleanText(bodyText),
+      visibleText: cleanText(visibleText),
       images
     });
-
-  } catch (e) {
+  } catch (err) {
     if (browser) {
-      try { await browser.close(); } catch {}
+      try {
+        await browser.close();
+      } catch {}
     }
 
     res.json({
       success: false,
-      error: e.message
+      error: err.message
     });
   }
 });
 
-const port = process.env.PORT || 10000;
-app.listen(port, () => {
+const port = process.env.PORT || 8080;
+
+app.listen(port, "0.0.0.0", () => {
   console.log("Server running on port " + port);
 });
