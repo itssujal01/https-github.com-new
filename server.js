@@ -1,107 +1,62 @@
 import express from "express";
 import cors from "cors";
+import { chromium } from "playwright";
 
 const app = express();
-
 app.use(cors({ origin: "*" }));
 
-function cleanText(text) {
-  return text
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+let browser;
 
-function findAvatar(html) {
-  const imgMatches = [...html.matchAll(/https?:\/\/[^"'\s<>]+?\.(?:png|jpg|jpeg|webp)/gi)];
-  const urls = imgMatches.map(m => m[0]);
-
-  return (
-    urls.find(u => u.includes("avatar")) ||
-    urls.find(u => u.includes("picuser")) ||
-    urls.find(u => u.includes("head")) ||
-    urls[0] ||
-    ""
-  );
-}
-
-function findPackages(text) {
-  const packages = [];
-
-  const priceRegex = /(₹\s?\d+)/g;
-  const prices = [...text.matchAll(priceRegex)].map(m => m[1]);
-
-  const packRegex = /(\d+\s*Gold)/gi;
-  const packs = [...text.matchAll(packRegex)].map(m => m[1]);
-
-  for (let i = 0; i < Math.min(prices.length, packs.length); i++) {
-    packages.push({
-      pack: packs[i],
-      price: prices[i],
-      extraGold: "0"
+async function getBrowser() {
+  if (!browser) {
+    browser = await chromium.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
   }
-
-  return packages;
-}
-
-function findName(text, id) {
-  let beforeId = text.split(id)[0] || "";
-  beforeId = beforeId.replace(/.*Controls/i, "").trim();
-
-  if (beforeId.length > 2 && beforeId.length < 80) {
-    return beforeId;
-  }
-
-  return "";
+  return browser;
 }
 
 app.get("/", async (req, res) => {
   const id = String(req.query.id || "").trim();
 
   if (!id) {
-    return res.json({
-      success: false,
-      message: "Please provide id"
-    });
+    return res.json({ success: false, message: "Please provide id" });
   }
 
-  try {
-    const url = `https://weplayapp.com/recharge?id=${encodeURIComponent(id)}`;
+  let page;
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1",
-        "Accept":
-          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9"
-      }
+  try {
+    const b = await getBrowser();
+    page = await b.newPage({
+      userAgent:
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
     });
 
-    const html = await response.text();
-    const visibleText = cleanText(html);
+    const url = `https://weplayapp.com/recharge?id=${encodeURIComponent(id)}`;
 
-    const userNotFound =
-      visibleText.toLowerCase().includes("user doesn't exist") ||
-      visibleText.toLowerCase().includes("user does not exist");
+    await page.goto(url, {
+      waitUntil: "networkidle",
+      timeout: 60000
+    });
 
-    if (userNotFound) {
-      return res.json({
-        success: false,
-        id,
-        message: "User not found"
-      });
-    }
+    await page.waitForTimeout(5000);
 
-    const avatar = findAvatar(html);
-    const packages = findPackages(visibleText);
-    const name = findName(visibleText, id);
+    const visibleText = await page.locator("body").innerText().catch(() => "");
+    const avatar = await page
+      .locator("img")
+      .evaluateAll(imgs => imgs.map(i => i.src).find(src => src.includes("picuser") || src.includes("avatar") || src.includes("head")) || "")
+      .catch(() => "");
+
+    const name = await page
+      .locator("body")
+      .evaluate((body, userId) => {
+        const text = body.innerText || "";
+        const before = text.split(userId)[0] || "";
+        const lines = before.split("\n").map(x => x.trim()).filter(Boolean);
+        return lines[lines.length - 1] || "";
+      }, id)
+      .catch(() => "");
 
     return res.json({
       success: true,
@@ -109,16 +64,17 @@ app.get("/", async (req, res) => {
       url,
       name,
       avatar,
-      packages,
       visibleText
     });
   } catch (error) {
     return res.json({
       success: false,
       id,
-      message: "Fetch failed",
+      message: "Playwright fetch failed",
       error: error.message
     });
+  } finally {
+    if (page) await page.close().catch(() => {});
   }
 });
 
@@ -127,7 +83,6 @@ app.get("/health", (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port", PORT);
 });
