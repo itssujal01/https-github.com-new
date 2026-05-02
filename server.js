@@ -17,20 +17,92 @@ async function getBrowser() {
   return browser;
 }
 
+function extractName(text, id) {
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes(`ID: ${id}`) || lines[i].includes(id)) {
+      const sameLine = lines[i];
+
+      const nameMatch = sameLine.match(/^(.+?)\s*ID\s*:/i);
+      if (nameMatch && nameMatch[1]) {
+        return nameMatch[1].trim();
+      }
+
+      return lines[i - 1] || "";
+    }
+  }
+
+  const inlineMatch = text.match(new RegExp(`([\\s\\S]{1,80})ID:\\s*${id}`));
+  if (inlineMatch && inlineMatch[1]) {
+    return inlineMatch[1]
+      .replace(/About Us|Contribute|Songs|Media|Parental Controls/gi, "")
+      .trim();
+  }
+
+  return "";
+}
+
+function extractPackages(text) {
+  const packages = [];
+  const regex = /(\d+\s*Gold)\s*(?:\+\s*(\d+)\s*bonus Gold)?\s*₹\s?(\d+)/gi;
+
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    packages.push({
+      pack: match[1] || "",
+      bonus: match[2] ? `${match[2]} bonus Gold` : "",
+      price: `₹${match[3]}`
+    });
+  }
+
+  return packages;
+}
+
+function extractMaskedEmail(text) {
+  const emailMatch = text.match(/[a-zA-Z0-9._%+-]*\*+[a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  return emailMatch ? emailMatch[0] : "";
+}
+
+async function extractAvatar(page) {
+  return await page
+    .locator("img")
+    .evaluateAll(imgs => {
+      const srcs = imgs.map(i => i.src).filter(Boolean);
+
+      return (
+        srcs.find(src => src.includes("picuser")) ||
+        srcs.find(src => src.includes("avatar")) ||
+        srcs.find(src => src.includes("head")) ||
+        srcs[0] ||
+        ""
+      );
+    })
+    .catch(() => "");
+}
+
 app.get("/", async (req, res) => {
   const id = String(req.query.id || "").trim();
 
   if (!id) {
-    return res.json({ success: false, message: "Please provide id" });
+    return res.json({
+      success: false,
+      message: "Please provide id"
+    });
   }
 
   let page;
 
   try {
     const b = await getBrowser();
+
     page = await b.newPage({
       userAgent:
-        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1",
+      viewport: {
+        width: 390,
+        height: 844
+      }
     });
 
     const url = `https://weplayapp.com/recharge?id=${encodeURIComponent(id)}`;
@@ -40,23 +112,26 @@ app.get("/", async (req, res) => {
       timeout: 60000
     });
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(4000);
 
     const visibleText = await page.locator("body").innerText().catch(() => "");
-    const avatar = await page
-      .locator("img")
-      .evaluateAll(imgs => imgs.map(i => i.src).find(src => src.includes("picuser") || src.includes("avatar") || src.includes("head")) || "")
-      .catch(() => "");
 
-    const name = await page
-      .locator("body")
-      .evaluate((body, userId) => {
-        const text = body.innerText || "";
-        const before = text.split(userId)[0] || "";
-        const lines = before.split("\n").map(x => x.trim()).filter(Boolean);
-        return lines[lines.length - 1] || "";
-      }, id)
-      .catch(() => "");
+    const notFound =
+      visibleText.toLowerCase().includes("user doesn't exist") ||
+      visibleText.toLowerCase().includes("user does not exist");
+
+    if (notFound) {
+      return res.json({
+        success: false,
+        id,
+        message: "User not found"
+      });
+    }
+
+    const name = extractName(visibleText, id);
+    const avatar = await extractAvatar(page);
+    const packages = extractPackages(visibleText);
+    const email = extractMaskedEmail(visibleText);
 
     return res.json({
       success: true,
@@ -64,6 +139,8 @@ app.get("/", async (req, res) => {
       url,
       name,
       avatar,
+      email,
+      packages,
       visibleText
     });
   } catch (error) {
@@ -74,7 +151,9 @@ app.get("/", async (req, res) => {
       error: error.message
     });
   } finally {
-    if (page) await page.close().catch(() => {});
+    if (page) {
+      await page.close().catch(() => {});
+    }
   }
 });
 
@@ -83,6 +162,7 @@ app.get("/health", (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port", PORT);
 });
