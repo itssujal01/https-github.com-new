@@ -1,0 +1,27 @@
+LUDO NOVA - INSTALL ON ANY PHP HOSTING (cPanel, Hostinger, etc.)
+================================================================
+
+Requirements: PHP 7.4 or newer (every cPanel host has it). No database, no
+Node.js, no Composer, nothing else.
+
+1. In cPanel open "File Manager" and go to public_html
+   (or a subfolder such as public_html/ludo).
+2. Click "Upload" and upload ludo-nova-cpanel.zip.
+3. Right-click the zip -> "Extract". Make sure index.html, api.php and the
+   "assets" and "data" folders end up directly in that folder.
+4. Open your website (https://yourdomain.com or https://yourdomain.com/ludo).
+   Done! Create a room and share the link or code with friends.
+
+If "Create room" shows "data folder is not writable":
+   In File Manager right-click the "data" folder -> "Change Permissions"
+   -> set 755 (or 775 on some hosts).
+
+If it says "api.php is not working":
+   In cPanel -> "Select PHP Version" / "MultiPHP Manager", pick PHP 7.4 or newer.
+
+Use HTTPS (free SSL via cPanel "SSL/TLS Status" / AutoSSL) for best results.
+
+Files:
+  index.html, assets/   the game (3D board, dice, UI)
+  api.php, engine.php   the game server (rooms, dice, rules, bots)
+  data/                 live rooms (created automatically, cleaned up after 30 min)

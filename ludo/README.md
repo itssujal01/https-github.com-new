@@ -28,11 +28,32 @@ Real-time multiplayer 3D Ludo in the browser. Players join as guests: no sign-up
 shared/engine.js    Pure rules engine (used by the server; tested)
 shared/board.js     Board geometry: track, home columns, yards
 shared/protocol.js  Shared constants: timings, avatars, reactions
+php/                PHP backend for shared hosting (api.php, engine.php, .htaccess)
 server/index.js     Express + Socket.IO server, security middleware
 server/rooms.js     Rooms, seats, turn timer, bots, reconnects
 client/             Vite app: Three.js scene, dice, tokens, UI
 test/               node:test suites for engine, board and server
 ```
+
+## Two ways to host it
+
+| | **PHP / cPanel** (easiest) | **Node.js** |
+|---|---|---|
+| Needs | Any host with PHP 7.4+ | Node.js 20+ (VPS, Render, Railway, …) |
+| Setup | Upload one zip to `public_html`, extract | `npm install && npm run build && npm start` |
+| Real-time | HTTP polling (~0.6 s delay) | WebSockets (instant) |
+| Server code | `php/api.php` + `php/engine.php` | `server/` |
+
+Both backends use the same rules. `test/php-engine.test.js` plays random games through the JS and PHP engines and checks that every step matches.
+
+### PHP / cPanel
+
+```bash
+npm install
+npm run build:cpanel    # -> build/ludo-nova-cpanel.zip
+```
+
+Upload `ludo-nova-cpanel.zip` to `public_html` (or a subfolder), then extract it. That is the whole install. The zip contains `INSTALL.txt` with step-by-step instructions. Rooms are stored as files in `data/`, which must be writable (755). Room files begin with a PHP exit guard, so they stay private even on servers that ignore `.htaccess`.
 
 ## Run locally
 

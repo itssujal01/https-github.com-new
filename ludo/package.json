@@ -11,7 +11,8 @@
     "dev": "concurrently -k -n server,client \"node --watch server/index.js\" \"vite\"",
     "build": "vite build",
     "start": "NODE_ENV=production node server/index.js",
-    "test": "node --test 'test/*.test.js'"
+    "test": "node --test 'test/*.test.js'",
+    "build:cpanel": "node scripts/build-cpanel.mjs"
   },
   "dependencies": {
     "express": "^5.2.1",
@@ -19,6 +20,7 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
+    "@fontsource/fredoka": "^5.3.0",
     "cannon-es": "^0.20.0",
     "concurrently": "^9.2.1",
     "socket.io-client": "^4.8.3",

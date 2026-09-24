@@ -1,3 +1,7 @@
+import '@fontsource/fredoka/latin-400.css';
+import '@fontsource/fredoka/latin-500.css';
+import '@fontsource/fredoka/latin-600.css';
+import '@fontsource/fredoka/latin-700.css';
 import { COLORS, YARD, HOME } from '../../shared/engine.js';
 import { AVATARS, REACTIONS } from '../../shared/protocol.js';
 import { World } from './scene/world.js';

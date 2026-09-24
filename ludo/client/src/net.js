@@ -1,4 +1,6 @@
-import { io } from 'socket.io-client';
+// Session handling on top of a transport: Socket.IO for the Node server, or
+// HTTP polling for PHP hosting. Vite picks one at build time via '#transport'.
+import { createTransport } from '#transport';
 
 const SESSION_KEY = 'ludo:session';
 const PROFILE_KEY = 'ludo:profile';
@@ -23,18 +25,18 @@ export class Net extends EventTarget {
     super();
     this.session = read(SESSION_KEY); // {code, token}
     this.playerId = null;
-    this.socket = io({ transports: ['websocket', 'polling'], reconnectionDelayMax: 4000 });
-    this.socket.on('connect', () => {
+    this.transport = createTransport();
+    this.transport.on('connect', () => {
       this.fire('connection', true);
       if (this.session) this.resume();
     });
-    this.socket.on('disconnect', () => this.fire('connection', false));
-    this.socket.on('connect_error', (err) => this.fire('connection-error', err.message));
+    this.transport.on('disconnect', () => this.fire('connection', false));
+    this.transport.on('connect_error', (err) => this.fire('connection-error', err?.message));
     for (const ev of ['room:state', 'game:events', 'game:reaction']) {
-      this.socket.on(ev, (data) => this.fire(ev, data));
+      this.transport.on(ev, (data) => this.fire(ev, data));
     }
-    this.socket.on('room:kicked', (reason) => this.end(reason || 'You were removed from the room'));
-    this.socket.on('room:closed', () => this.end('The room was closed'));
+    this.transport.on('room:kicked', (reason) => this.end(reason || 'You were removed from the room'));
+    this.transport.on('room:closed', () => this.end('The room was closed'));
   }
 
   fire(type, detail) {
@@ -42,12 +44,7 @@ export class Net extends EventTarget {
   }
 
   call(event, payload = {}) {
-    return new Promise((resolve) => {
-      if (!this.socket.connected) return resolve({ ok: false, error: 'Not connected, retrying…' });
-      this.socket.timeout(8000).emit(event, payload, (err, res) => {
-        resolve(err ? { ok: false, error: 'Server did not respond' } : res);
-      });
-    });
+    return this.transport.call(event, payload);
   }
 
   async enter(event, payload) {
@@ -78,6 +75,7 @@ export class Net extends EventTarget {
   end(reason) {
     this.session = null;
     this.playerId = null;
+    this.transport.setSession(null);
     write(SESSION_KEY, null);
     this.fire('left', reason);
   }
