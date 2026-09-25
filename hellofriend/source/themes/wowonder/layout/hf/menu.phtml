@@ -1,0 +1,82 @@
+<?php
+// hellofriend v4: full-screen Menu (phones) — profile, every feature as a shortcut, settings.
+include_once __DIR__ . '/icons.php';
+$c = $wo['config'];
+$hf_short = array();
+$add = function ($on, $url, $ajax, $icon, $tone, $label) use (&$hf_short) {
+    if ($on) { $hf_short[] = array('url' => $url, 'ajax' => $ajax, 'icon' => $icon, 'tone' => $tone, 'label' => $label); }
+};
+$add($c['find_friends'] == 1, 'index.php?link1=friends-nearby', '', 'user-plus', 'blue', hf_t('find_friends', 'Find friends'));
+if ($c['groups'] == 1) {
+    $gp = $c['can_use_groups'] ? 'groups' : 'joined_groups';
+    $add(true, 'index.php?link1=' . $gp, '?link1=' . $gp, 'users', 'violet', hf_t('groups', 'Groups'));
+}
+$add($c['pages'] == 1 && $c['can_use_pages'], 'index.php?link1=pages', '?link1=pages', 'flag', 'orange', hf_t('pages', 'Pages'));
+$add($c['events'] == 1, 'index.php?link1=events', '?link1=events', 'calendar', 'red', hf_t('events', 'Events'));
+$add($c['classified'] == 1, 'index.php?link1=products', '', 'store', 'teal', hf_t('market', 'Market'));
+$add($c['website_mode'] != 'twitter' && $c['watch_page'] == 1, 'index.php?link1=watch', '?link1=watch', 'watch', 'blue', hf_t('watch', 'Watch'));
+$add($c['website_mode'] != 'twitter' && $c['reels_upload'] == 1 && $c['have_reels'] > 0, 'index.php?link1=reels', '', 'reels', 'pink', hf_t('reels', 'Reels'));
+$add(true, 'index.php?link1=saved-posts', '?link1=saved-posts', 'bookmark', 'violet', TextForMode('saved_posts'));
+$add($c['memories_system'] == 1, 'index.php?link1=memories', '?link1=memories', 'history', 'blue', hf_t('memories', 'Memories'));
+$add(true, 'index.php?link1=albums', '?link1=albums', 'image', 'green', hf_t('albums', 'Albums'));
+$add($c['popular_posts'] == 1, 'index.php?link1=most_liked', '?link1=most_liked', 'trending', 'orange', hf_t('popular_posts', 'Popular'));
+$add(true, 'index.php?link1=search?query=', '', 'compass', 'teal', hf_t('explore', 'Explore'));
+$add($c['blogs'] == 1, 'index.php?link1=blogs', '?link1=blogs', 'news', 'blue', hf_t('blog', 'Blogs'));
+$add($c['job_system'] == 1, 'index.php?link1=jobs', '?link1=jobs', 'briefcase', 'orange', hf_t('jobs', 'Jobs'));
+$add($c['funding_system'] == 1, 'index.php?link1=funding', '?link1=funding', 'piggy', 'green', hf_t('funding', 'Funding'));
+$add($c['games'] == 1, 'index.php?link1=new-game', '?link1=new-game', 'game', 'violet', hf_t('games', 'Games'));
+$add($c['movies'] == 1 && $c['can_use_movies'], 'index.php?link1=movies', '', 'film', 'red', hf_t('movies', 'Movies'));
+$add($c['forum'] == 1, 'index.php?link1=forum', '', 'forum', 'teal', hf_t('forum', 'Forum'));
+$add($c['offer_system'] == 1, 'index.php?link1=offers', '?link1=offers', 'gift', 'pink', hf_t('offers', 'Offers'));
+$add($c['poke_system'] == 1, 'index.php?link1=poke', '?link1=poke', 'hand', 'orange', hf_t('pokes', 'Pokes'));
+$add($c['nearby_shop_system'] == 1, 'index.php?link1=nearby_shops', '?link1=nearby_shops', 'pin', 'red', hf_t('nearby_shops', 'Nearby shops'));
+$add($c['nearby_business_system'] == 1, 'index.php?link1=nearby_business', '?link1=nearby_business', 'building', 'blue', hf_t('nearby_business', 'Nearby business'));
+$add($c['common_things'] == 1, 'index.php?link1=common_things', '?link1=common_things', 'layers', 'violet', hf_t('common_things', 'Common things'));
+$add($c['user_ads'] == 1, 'index.php?link1=advertise', '?link1=advertise', 'megaphone', 'pink', hf_t('ads', 'Ads'));
+$add($c['monetization'] == 1, 'index.php?link1=subscriptions', '?link1=subscriptions', 'star', 'orange', hf_t('subscriptions', 'Subscriptions'));
+$add(true, 'index.php?link1=wallet', '?link1=wallet', 'wallet', 'green', hf_t('wallet', 'Wallet'));
+?>
+<section class="hf-screen hf-menu" id="hf-menu" role="dialog" aria-modal="true" aria-labelledby="hf-menu-title" hidden>
+  <header class="hf-screen-head">
+    <h2 id="hf-menu-title"><?php echo hf_t('menu', 'Menu'); ?></h2>
+    <div class="hf-screen-actions">
+      <a class="hf-icon-btn" href="<?php echo Wo_SeoLink('index.php?link1=search'); ?>" data-ajax="?link1=search" aria-label="<?php echo hf_t('search', 'Search'); ?>"><?php echo hf_icon('search', 22); ?></a>
+      <button type="button" class="hf-icon-btn" data-hf-close aria-label="Close"><?php echo hf_icon('x', 22); ?></button>
+    </div>
+  </header>
+  <div class="hf-screen-body">
+    <a class="hf-me" href="<?php echo $wo['user']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username']; ?>">
+      <img src="<?php echo $wo['user']['avatar']; ?>" alt="" loading="lazy">
+      <span class="hf-me-text"><b><?php echo $wo['user']['name']; ?></b><small><?php echo hf_t('view_profile', 'See your profile'); ?></small></span>
+      <?php echo hf_icon('chevron', 20, 'hf-me-go'); ?>
+    </a>
+    <div class="hf-me-chips">
+      <a class="hf-chip" href="<?php echo Wo_SeoLink('index.php?link1=wallet'); ?>" data-ajax="?link1=wallet"><?php echo hf_icon('wallet', 16); ?> <?php echo Wo_GetCurrency($c['ads_currency']) . number_format((float) $wo['user']['wallet'], 2); ?></a>
+      <?php if ($c['point_level_system'] == 1) { ?>
+      <a class="hf-chip" href="<?php echo Wo_SeoLink('index.php?link1=setting&page=my_points'); ?>" data-ajax="?link1=setting&page=my_points"><?php echo hf_icon('star', 16); ?> <?php echo (int) $wo['user']['points']; ?> <?php echo hf_t('points', 'points'); ?></a>
+      <?php } ?>
+      <a class="hf-chip" href="<?php echo Wo_SeoLink('index.php?link1=setting&page=profile-setting'); ?>" data-ajax="?link1=setting&page=profile-setting"><?php echo hf_icon('pen', 16); ?> <?php echo hf_t('edit', 'Edit'); ?></a>
+    </div>
+
+    <h3 class="hf-section-title"><?php echo hf_t('shortcuts', 'Your shortcuts'); ?></h3>
+    <div class="hf-shortcuts">
+      <?php foreach ($hf_short as $i => $s) { ?>
+      <a class="hf-shortcut" href="<?php echo Wo_SeoLink($s['url']); ?>"<?php echo !empty($s['ajax']) ? ' data-ajax="' . $s['ajax'] . '"' : ''; ?> style="--d:<?php echo min($i, 14) * 22; ?>ms"><span class="hf-tile hf-tone-<?php echo $s['tone']; ?>"><?php echo hf_icon($s['icon'], 22); ?></span><span class="hf-shortcut-label"><?php echo $s['label']; ?></span></a>
+      <?php } ?>
+    </div>
+
+    <h3 class="hf-section-title"><?php echo hf_t('setting', 'Settings'); ?></h3>
+    <div class="hf-list">
+      <a class="hf-row" href="<?php echo Wo_SeoLink('index.php?link1=setting'); ?>" data-ajax="?link1=setting"><span class="hf-tile hf-tone-gray"><?php echo hf_icon('settings', 20); ?></span><span><?php echo hf_t('setting', 'Settings'); ?></span><?php echo hf_icon('chevron', 18, 'hf-row-go'); ?></a>
+      <a class="hf-row" href="<?php echo Wo_SeoLink('index.php?link1=setting&page=privacy-setting'); ?>" data-ajax="?link1=setting&page=privacy-setting"><span class="hf-tile hf-tone-blue"><?php echo hf_icon('shield', 20); ?></span><span><?php echo hf_t('privacy', 'Privacy'); ?></span><?php echo hf_icon('chevron', 18, 'hf-row-go'); ?></a>
+      <button type="button" class="hf-row" id="hf-dark-row"><span class="hf-tile hf-tone-indigo"><?php echo hf_icon('moon', 20); ?></span><span><?php echo hf_t('night_mode', 'Dark mode'); ?></span><span class="hf-switch" aria-hidden="true"><i></i></span></button>
+      <button type="button" class="hf-row" onclick="$('.dropdown-switch-account').addClass('open');"><span class="hf-tile hf-tone-teal"><?php echo hf_icon('switch', 20); ?></span><span><?php echo hf_t('switch_account', 'Switch account'); ?></span><?php echo hf_icon('chevron', 18, 'hf-row-go'); ?></button>
+      <a class="hf-row" href="<?php echo Wo_SeoLink('index.php?link1=contact-us'); ?>" data-ajax="?link1=contact-us"><span class="hf-tile hf-tone-green"><?php echo hf_icon('help', 20); ?></span><span><?php echo hf_t('contact_us', 'Help & support'); ?></span><?php echo hf_icon('chevron', 18, 'hf-row-go'); ?></a>
+      <?php if (Wo_IsAdmin() || Wo_IsModerator()) { ?>
+      <a class="hf-row" href="<?php echo hf_admin_url(); ?>"><span class="hf-tile hf-tone-violet"><?php echo hf_icon('dashboard', 20); ?></span><span><?php echo hf_t('admin_area', 'Admin panel'); ?></span><?php echo hf_icon('chevron', 18, 'hf-row-go'); ?></a>
+      <?php } ?>
+    </div>
+    <a class="hf-logout" href="<?php echo Wo_SeoLink('index.php?link1=logout') . '/?cache=' . time(); ?>"><?php echo hf_icon('logout', 20); ?> <?php echo hf_t('log_out', 'Log out'); ?></a>
+    <p class="hf-legal"><?php echo $c['siteName']; ?> &copy; <?php echo date('Y'); ?></p>
+  </div>
+</section>

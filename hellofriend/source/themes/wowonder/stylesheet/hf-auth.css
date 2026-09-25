@@ -1,0 +1,66 @@
+/* Hello Friend UI v4 — sign in / sign up / password pages */
+@font-face{font-family:"HF Inter";src:url(../fonts/hf/inter-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"HF Inter";src:url(../fonts/hf/inter-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"HF Inter";src:url(../fonts/hf/inter-latin-600-normal.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"HF Inter";src:url(../fonts/hf/inter-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{--a-font:"HF Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--a-grad:linear-gradient(135deg,#5B45F5 0%,#9A4CF2 48%,#F5479A 78%,#F7706A 100%);--a-v:#5B45F5;--a-text:#10121A;--a-text2:#5E6475;--a-fill:#F3F4F8;--a-line:#E6E8EF}
+@keyframes aFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(20px,-30px,0) scale(1.08)}}
+@keyframes aUp{from{opacity:0;transform:translate3d(0,26px,0)}to{opacity:1;transform:none}}
+@keyframes aGrad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+body.hf-p-welcome,body.hf-p-welcome *:not(.fa):not([class*="fa-"]){font-family:var(--a-font)!important}
+html body.hf-p-welcome{isolation:isolate;background:#1B1150!important;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.hf-p-welcome::before,body.hf-p-welcome::after{content:"";position:fixed;z-index:-1;border-radius:50%;opacity:.9;pointer-events:none;animation:aFloat 14s ease-in-out infinite}
+body.hf-p-welcome::before{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,#6C4DFF 0%,rgba(108,77,255,0) 70%)}
+body.hf-p-welcome::after{width:60vmax;height:60vmax;right:-25vmax;bottom:-25vmax;background:radial-gradient(circle,#F5479A 0%,rgba(245,71,154,0) 70%);animation-delay:-6s}
+body.hf-p-welcome .welcome-container,body.hf-p-welcome #contnet,body.hf-p-welcome .wrapper{position:relative;z-index:1;background:transparent!important}
+body.hf-p-welcome .login{display:flex!important;flex-direction:column;align-items:center;min-height:100vh;background:transparent!important;padding:0!important;margin:0!important;box-shadow:none!important;max-width:none!important;width:100%!important}
+/* brand side */
+body.hf-p-welcome .login_left_combo_parent{width:100%!important;max-width:520px;background:transparent!important;padding:calc(34px + env(safe-area-inset-top,0px)) 24px 22px!important;min-height:0!important;position:static!important;flex:none}
+body.hf-p-welcome .login_left_combo_parent::before,body.hf-p-welcome .login_left_combo_parent::after,body.hf-p-welcome .login_left_combo::before,body.hf-p-welcome .login_left_combo::after,body.hf-p-welcome .wo_regi_features:before{display:none!important}
+body.hf-p-welcome .login_left_combo{padding:0!important;color:#fff!important;text-align:left;animation:aUp .7s cubic-bezier(.2,.8,.2,1) both;position:static!important;max-width:none!important}
+body.hf-p-welcome .login_left_combo .logo img{height:40px!important;width:auto!important;max-height:none!important}
+body.hf-p-welcome .login_left_combo h1{color:#fff!important;font-size:34px!important;font-weight:800!important;letter-spacing:-.04em;line-height:1.08;margin:26px 0 10px!important}
+body.hf-p-welcome .login_left_combo p{color:rgba(255,255,255,.78)!important;font-size:16px!important;line-height:1.5;margin:0!important;letter-spacing:0!important}
+/* form card */
+body.hf-p-welcome .login>.col-md-6,body.hf-p-welcome .login>div:not(.login_left_combo_parent){width:100%!important;max-width:520px;padding:0 12px!important;float:none!important;flex:1;display:flex;flex-direction:column}
+body.hf-p-welcome .login_innre{background:#fff!important;border-radius:30px!important;padding:28px 22px 22px!important;box-shadow:0 30px 80px -20px rgba(0,0,0,.55)!important;animation:aUp .7s .08s cubic-bezier(.2,.8,.2,1) both;margin:0!important;max-width:none!important;width:auto!important}
+body.hf-p-welcome .login_innre .title.main{color:var(--a-text)!important;-webkit-text-fill-color:currentColor;font-size:28px!important;font-weight:800!important;letter-spacing:-.035em;margin:0 0 4px!important;line-height:1.15}
+body.hf-p-welcome .login_innre .desc{color:var(--a-text2)!important;font-size:15px!important;margin:0 0 20px!important}
+body.hf-p-welcome .wow_form_fields{margin-bottom:14px!important;position:relative}
+body.hf-p-welcome .wow_form_fields label{font-size:13px!important;font-weight:700!important;color:var(--a-text2)!important;margin:0 0 6px 4px!important;display:block}
+body.hf-p-welcome .wow_form_fields input,body.hf-p-welcome .wow_form_fields select,body.hf-p-welcome .login_innre input.form-control,body.hf-p-welcome .login_innre select{height:52px!important;border-radius:16px!important;border:1.5px solid transparent!important;background:var(--a-fill)!important;font-size:16px!important;color:var(--a-text)!important;padding:0 16px!important;box-shadow:none!important;width:100%;transition:border-color .15s,background .15s,box-shadow .15s;outline:none!important}
+body.hf-p-welcome .wow_form_fields input:focus,body.hf-p-welcome .wow_form_fields select:focus{background:#fff!important;border-color:var(--a-v)!important;box-shadow:0 0 0 4px rgba(91,69,245,.14)!important}
+body.hf-p-welcome .forgot_password{display:flex!important;align-items:center;justify-content:space-between;margin:4px 0 18px!important;font-size:14px}
+body.hf-p-welcome .forgot_password a,body.hf-p-welcome a.main,body.hf-p-welcome .dec.main{color:var(--a-v)!important;font-weight:700!important}
+body.hf-p-welcome .terms,body.hf-p-welcome .terms label{color:var(--a-text2)!important;font-size:14px!important;font-weight:500!important}
+body.hf-p-welcome input[type=checkbox]{accent-color:var(--a-v)}
+body.hf-p-welcome .login_innre .btn,body.hf-p-welcome .login_innre button[type=submit],body.hf-p-welcome .btn-main{height:54px!important;border-radius:18px!important;border:0!important;background:var(--a-grad)!important;background-size:180% 180%!important;animation:aGrad 8s ease infinite;color:#fff!important;font-size:16.5px!important;font-weight:700!important;box-shadow:0 14px 30px -10px rgba(91,69,245,.65)!important;width:100%;transition:transform .18s cubic-bezier(.34,1.56,.64,1),filter .2s}
+body.hf-p-welcome .login_innre .btn:active,body.hf-p-welcome .login_innre button:active{transform:scale(.97)}
+body.hf-p-welcome .login_innre .btn:disabled,body.hf-p-welcome .login_innre .btn.disabled{opacity:.55}
+body.hf-p-welcome .login_signup_combo{margin-top:6px}
+body.hf-p-welcome .login_signup_combo p,body.hf-p-welcome .login_innre p{color:var(--a-text2)}
+body.hf-p-welcome .signup__{text-align:center;margin-top:14px;font-size:15px}
+body.hf-p-welcome .social-btns,body.hf-p-welcome .login_innre .social_login{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+body.hf-p-welcome .login_innre .social-btn,body.hf-p-welcome .login_innre .btn-social{border-radius:14px!important}
+body.hf-p-welcome .alert{border-radius:14px!important;border:0!important}
+body.hf-p-welcome .random_users{margin-top:22px}
+body.hf-p-welcome .users-profiles{justify-content:center}
+body.hf-p-welcome .users-profiles img{border:3px solid #fff!important;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+body.hf-p-welcome .footer,body.hf-p-welcome .welcome-footer{background:transparent!important;color:rgba(255,255,255,.6)!important;font-size:12.5px;text-align:center;padding:18px 10px calc(18px + env(safe-area-inset-bottom,0px))!important;border:0!important;position:static!important}
+body.hf-p-welcome .welcome-footer a{color:rgba(255,255,255,.8)!important}
+body.hf-p-welcome .cc-window{border-radius:18px!important;left:12px!important;right:12px!important;bottom:12px!important;margin:0!important;max-width:none!important;background:rgba(20,16,50,.92)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:13.5px!important;padding:12px 14px!important;display:flex;flex-direction:row!important;align-items:center;gap:10px}
+body.hf-p-welcome .cc-window .cc-btn{border-radius:999px!important;background:#fff!important;color:#10121A!important;border:0!important;padding:8px 16px!important;font-size:13.5px!important;width:auto!important;min-width:0!important}
+body.hf-p-welcome .cc-window .cc-message{margin:0!important}
+@media (min-width:992px){
+  body.hf-p-welcome .login{flex-direction:row;justify-content:center;align-items:center;gap:64px;padding:40px!important}
+  body.hf-p-welcome .login_left_combo_parent{max-width:480px;padding:0!important}
+  body.hf-p-welcome .login_left_combo h1{font-size:54px!important}
+  body.hf-p-welcome .login>.col-md-6{max-width:460px;flex:none;padding:0!important}
+  body.hf-p-welcome .login_innre{padding:36px 34px 28px!important}
+}
+@media (prefers-reduced-motion:reduce){body.hf-p-welcome *,body.hf-p-welcome::before,body.hf-p-welcome::after{animation:none!important}}
+body.hf-p-welcome .login_left_combo_parent>svg,body.hf-p-welcome .login_left_combo_parent svg[preserveAspectRatio="none"]{display:none!important}
+body.hf-p-welcome .login_innre form,body.hf-p-welcome .login_innre>div{margin-top:0!important;padding-top:0!important}
+body.hf-p-welcome .login_innre .title.main,body.hf-p-welcome .login_innre .desc{padding:0!important;line-height:1.2!important;height:auto!important}body.hf-p-welcome .login_innre{padding-top:26px!important}body.hf-p-welcome .login_innre>*:first-child{margin-top:0!important}
+body.hf-p-welcome .login_innre::before,body.hf-p-welcome .login_innre::after{display:none!important}
+.cc-window.cc-invisible{pointer-events:none!important}

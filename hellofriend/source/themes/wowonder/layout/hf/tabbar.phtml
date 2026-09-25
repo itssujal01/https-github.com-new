@@ -1,0 +1,28 @@
+<?php
+// hellofriend v4: app tab bar (phones) + the Create sheet and Menu screen it opens.
+// Everything here only links to WoWonder pages or clicks WoWonder's own controls,
+// so permissions, counters and features keep working exactly as before.
+if ($wo['loggedin'] != true) { return; }
+include_once __DIR__ . '/icons.php';
+$hf_video = null;
+if ($wo['config']['website_mode'] != 'twitter' && $wo['config']['reels_upload'] == 1 && $wo['config']['have_reels'] > 0) {
+    $hf_video = array('url' => Wo_SeoLink('index.php?link1=reels'), 'ajax' => '', 'label' => hf_t('reels', 'Reels'), 'key' => 'reels', 'icon' => 'reels');
+} elseif ($wo['config']['website_mode'] != 'twitter' && $wo['config']['watch_page'] == 1) {
+    $hf_video = array('url' => Wo_SeoLink('index.php?link1=watch'), 'ajax' => '?link1=watch', 'label' => hf_t('watch', 'Watch'), 'key' => 'watch', 'icon' => 'watch');
+}
+?>
+<nav class="hf-tabbar" id="hf-tabbar" aria-label="Main">
+  <a class="hf-tab" data-hf-tab="home" href="<?php echo $wo['config']['site_url']; ?>" data-ajax="?index.php?link1=home"><?php echo hf_icon('home', 26); ?><span><?php echo hf_t('home', 'Home'); ?></span></a>
+  <?php if ($hf_video) { ?>
+  <a class="hf-tab" data-hf-tab="<?php echo $hf_video['key']; ?>" href="<?php echo $hf_video['url']; ?>"<?php echo !empty($hf_video['ajax']) ? ' data-ajax="' . $hf_video['ajax'] . '"' : ''; ?>><?php echo hf_icon($hf_video['icon'], 26); ?><span><?php echo $hf_video['label']; ?></span></a>
+  <?php } else { ?>
+  <a class="hf-tab" data-hf-tab="search" href="<?php echo Wo_SeoLink('index.php?link1=search'); ?>" data-ajax="?link1=search"><?php echo hf_icon('search', 26); ?><span><?php echo hf_t('search', 'Search'); ?></span></a>
+  <?php } ?>
+  <button type="button" class="hf-tab hf-tab-create" data-hf-tab="create" data-hf-open="hf-create" aria-label="<?php echo hf_t('create', 'Create'); ?>"><span class="hf-fab"><?php echo hf_icon('plus', 26); ?></span></button>
+  <button type="button" class="hf-tab" data-hf-tab="notifications" id="hf-tab-bell"><span class="hf-tab-ico"><?php echo hf_icon('bell', 26); ?><b class="hf-badge" id="hf-bell-badge" hidden></b></span><span><?php echo hf_t('notifications', 'Notifications'); ?></span></button>
+  <button type="button" class="hf-tab" data-hf-tab="menu" data-hf-open="hf-menu"><img class="hf-tab-avatar" src="<?php echo $wo['user']['avatar']; ?>" alt="" loading="lazy"><span><?php echo hf_t('menu', 'Menu'); ?></span></button>
+</nav>
+<div class="hf-scrim" id="hf-scrim"></div>
+<?php echo Wo_LoadPage('hf/create'); ?>
+<?php echo Wo_LoadPage('hf/menu'); ?>
+<div class="hf-toast" id="hf-toast" role="status" aria-live="polite"></div>

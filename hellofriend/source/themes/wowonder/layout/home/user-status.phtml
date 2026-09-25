@@ -1,0 +1,7 @@
+<li class="<?php echo($wo['user_status']['have_not_seen'] ? "not_seen_story" : ""); ?>">
+	<a class="see_all_stories" data_story_user_id="<?php echo $wo['user_status']['user_data']['user_id']?>" data_story_type="friends">
+		<img src="<?php echo $wo['user_status']['thumb']['filename'];?>" loading="lazy" alt="">
+		<span class="hf-story-ava"><img src="<?php echo $wo['user_status']['user_data']['avatar']; ?>" loading="lazy" alt=""></span>
+		<p><?php echo $wo['user_status']['user_data']['name']?></p>
+	</a>
+</li>

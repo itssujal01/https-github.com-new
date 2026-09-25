@@ -1,0 +1,55 @@
+<?php
+// hellofriend v4: "Create" bottom sheet. Post / photo / video / reel use the feed composer
+// (hf-ui.js opens it, going to Home first when needed); the rest are WoWonder's create pages.
+include_once __DIR__ . '/icons.php';
+$hf_items = array();
+$hf_items[] = array('act' => 'post', 'icon' => 'pen', 'tone' => 'violet', 'label' => hf_t('post', 'Post', 9));
+$hf_items[] = array('act' => 'photo', 'icon' => 'image', 'tone' => 'green', 'label' => hf_t('photos', 'Photos', 9));
+if ($wo['config']['video_upload'] == 1) {
+    $hf_items[] = array('act' => 'video', 'icon' => 'video', 'tone' => 'red', 'label' => hf_t('video', 'Video', 9));
+}
+if ($wo['config']['reels_upload'] == 1 && $wo['config']['website_mode'] != 'twitter') {
+    $hf_items[] = array('act' => 'reel', 'icon' => 'reels', 'tone' => 'pink', 'label' => hf_t('reels', 'Reel', 9));
+}
+$hf_items[] = array('url' => 'index.php?link1=create-status', 'ajax' => '?link1=create-status', 'icon' => 'camera', 'tone' => 'orange', 'label' => hf_t('story', 'Story', 9));
+if ($wo['config']['website_mode'] != 'askfm') {
+    $hf_items[] = array('url' => 'index.php?link1=create-album', 'ajax' => '?link1=create-album', 'icon' => 'layers', 'tone' => 'teal', 'label' => hf_t('album', 'Album', 9));
+}
+if ($wo['config']['groups'] == 1 && $wo['config']['can_use_groups']) {
+    $hf_items[] = array('url' => 'index.php?link1=create-group', 'ajax' => '?link1=create-group', 'icon' => 'users', 'tone' => 'blue', 'label' => hf_t('group', 'Group', 9));
+}
+if ($wo['config']['pages'] == 1 && $wo['config']['can_use_pages']) {
+    $hf_items[] = array('url' => 'index.php?link1=create-page', 'ajax' => '?link1=create-page', 'icon' => 'flag', 'tone' => 'orange', 'label' => hf_t('page', 'Page', 9));
+}
+if ($wo['config']['events'] == 1 && $wo['config']['can_use_events']) {
+    $hf_items[] = array('url' => 'index.php?link1=create-event', 'icon' => 'calendar', 'tone' => 'red', 'label' => hf_t('event', 'Event', 9));
+}
+if ($wo['config']['classified'] == 1 && $wo['config']['can_use_market']) {
+    $hf_items[] = array('act' => 'product', 'icon' => 'bag', 'tone' => 'teal', 'label' => hf_t('sell', 'Sell', 9));
+}
+if (Wo_CanBlog() == true) {
+    $hf_items[] = array('url' => 'index.php?link1=create-blog', 'icon' => 'news', 'tone' => 'blue', 'label' => hf_t('article', 'Article', 9));
+}
+if ($wo['config']['funding_system'] == 1) {
+    $hf_items[] = array('url' => 'index.php?link1=create_funding', 'ajax' => '?link1=create_funding', 'icon' => 'piggy', 'tone' => 'green', 'label' => hf_t('funding', 'Funding', 9));
+}
+if ($wo['config']['user_ads'] == 1) {
+    $hf_items[] = array('url' => 'index.php?link1=create-ads', 'icon' => 'megaphone', 'tone' => 'violet', 'label' => hf_t('ad', 'Ad', 9));
+}
+?>
+<section class="hf-sheet hf-create" id="hf-create" role="dialog" aria-modal="true" aria-labelledby="hf-create-title" hidden>
+  <div class="hf-sheet-grip"></div>
+  <header class="hf-sheet-head">
+    <h2 id="hf-create-title"><?php echo hf_t('create', 'Create'); ?></h2>
+    <button type="button" class="hf-icon-btn" data-hf-close aria-label="Close"><?php echo hf_icon('x', 22); ?></button>
+  </header>
+  <div class="hf-create-grid">
+    <?php foreach ($hf_items as $i => $it) {
+      $style = ' style="--d:' . ($i * 28) . 'ms"';
+      if (!empty($it['act'])) { ?>
+    <button type="button" class="hf-create-item" data-hf-compose="<?php echo $it['act']; ?>"<?php echo $style; ?>><span class="hf-tile hf-tone-<?php echo $it['tone']; ?>"><?php echo hf_icon($it['icon'], 24); ?></span><span><?php echo $it['label']; ?></span></button>
+    <?php } else { ?>
+    <a class="hf-create-item" href="<?php echo Wo_SeoLink($it['url']); ?>"<?php echo !empty($it['ajax']) ? ' data-ajax="' . $it['ajax'] . '"' : ''; ?><?php echo $style; ?>><span class="hf-tile hf-tone-<?php echo $it['tone']; ?>"><?php echo hf_icon($it['icon'], 24); ?></span><span><?php echo $it['label']; ?></span></a>
+    <?php } } ?>
+  </div>
+</section>
