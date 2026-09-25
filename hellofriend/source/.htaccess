@@ -18,9 +18,9 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^password-reset/([^\/]+)(\/|)$  index.php?link1=welcome&link2=password_reset&user_id=$1 [NC,QSA]
-# hellofriend: private admin address (also set in hf-admin-path.php)
-RewriteRule ^hf-studio-52wi3bt9/?$ admincp.php [NC,QSA,L]
-RewriteRule ^hf-studio-52wi3bt9/(.*)$ admincp.php?page=$1 [NC,QSA,L]
+# hellofriend: private admin address (the exact word is in hf-admin-path.php, made on this server)
+RewriteRule ^hfa-[a-z0-9]{24}/?$ admincp.php [QSA,L]
+RewriteRule ^hfa-[a-z0-9]{24}/(.*)$ admincp.php?page=$1 [QSA,L]
 RewriteRule ^adminPages/(.*)$ admin-panel/$1 [L]
 RewriteRule ^start-up(/?|)$ index.php?link1=start-up [NC,QSA]
 RewriteRule ^watch/(.*)$ index.php?link1=watch&id=$1 [NC,QSA]

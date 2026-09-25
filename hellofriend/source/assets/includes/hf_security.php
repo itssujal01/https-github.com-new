@@ -9,15 +9,59 @@ function hf_is_https()
 }
 
 // The admin panel lives at a private address instead of the well-known /admin-cp.
+// The address is made on the server itself the first time it is needed and kept in
+// hf-admin-path.php, so it never appears in an update zip or in the source code.
+// Admins find it in the app menu ("Admin panel").
 function hf_admin_slug()
 {
     static $slug = null;
-    if ($slug === null) {
-        $file = dirname(__DIR__, 2) . '/hf-admin-path.php';
-        $value = is_file($file) ? include $file : '';
-        $slug = (is_string($value) && preg_match('/^[A-Za-z0-9_-]{6,64}$/', $value)) ? $value : 'admin-cp';
+    if ($slug !== null) {
+        return $slug;
     }
-    return $slug;
+    $file = dirname(__DIR__, 2) . '/hf-admin-path.php';
+    $value = is_file($file) ? include $file : '';
+    // addresses that were ever published (older update packages) are replaced
+    $retired = array('hf-studio-52wi3bt9');
+    if (is_string($value) && preg_match('/^hfa-[a-z0-9]{24}$/', $value) && !in_array($value, $retired, true)) {
+        return $slug = $value;
+    }
+    // one request makes the address; others wait for it and read the same file
+    $root = dirname(__DIR__, 2);
+    $lock = @fopen($root . '/cache/hf-admin-path.lock', 'c');
+    if ($lock) {
+        flock($lock, LOCK_EX);
+        clearstatcache(true, $file);
+        if (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($file, true);
+        }
+        $again = is_file($file) ? include $file : '';
+        if (is_string($again) && preg_match('/^hfa-[a-z0-9]{24}$/', $again) && !in_array($again, $retired, true)) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            return $slug = $again;
+        }
+    }
+    $alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    $new = 'hfa-';
+    for ($i = 0; $i < 24; $i++) {
+        $new .= $alphabet[random_int(0, 35)];
+    }
+    $code = "<?php\n// Hello Friend: private address of the admin panel (https://your-site/<this value>).\n"
+        . "// Made automatically on this server. Delete this file to get a new address.\nreturn '" . $new . "';\n";
+    $tmp = $root . '/cache/hf-admin-path.' . getmypid() . '.tmp';
+    $saved = @file_put_contents($tmp, $code, LOCK_EX) !== false && @rename($tmp, $file);
+    if ($saved && function_exists('opcache_invalidate')) {
+        @opcache_invalidate($file, true);
+    }
+    if ($lock) {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+    if ($saved) {
+        return $slug = $new;
+    }
+    // could not save it: keep whatever was there so the panel stays reachable
+    return $slug = (is_string($value) && preg_match('/^[A-Za-z0-9_-]{6,64}$/', $value)) ? $value : 'hfa-unavailable';
 }
 
 function hf_admin_url($link = '')

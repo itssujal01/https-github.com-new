@@ -221,6 +221,14 @@
           fbsdk: { js: ['/javascript/sdk.js'] }
         };
         window.hfPlyrIcons = t + '/player/plyr.svg';
+        // tooltips: set up only the new ones, in one batch, and not on touch phones
+        window.hfTip = function () {
+          clearTimeout(window.hfTip.t);
+          window.hfTip.t = setTimeout(function () {
+            if (!window.jQuery || !jQuery.fn.tooltip || (window.matchMedia && matchMedia('(hover: none)').matches)) { return; }
+            jQuery('[data-toggle="tooltip"]:not([data-hf-tip])').attr('data-hf-tip', '1').tooltip();
+          }, 40);
+        };
         window.hfRequire = function () {
           for (var i = 0; i < arguments.length; i++) {
             var l = libs[arguments[i]];
@@ -855,7 +863,7 @@
       <?php } ?>
    </head>
 
-   <body class="<?php echo ($wo['page'] != 'welcome') ? 'hf-app ' : ''; ?><?php echo !empty($wo['hf_free_pro']) ? 'hf-free-pro ' : ''; ?>hf-p-<?php echo Wo_Secure($wo['page']); ?>" data-hf-page="<?php echo Wo_Secure($wo['page']); ?>" <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>
+   <body class="<?php echo ($wo['page'] != 'welcome') ? 'hf-app ' : ''; ?><?php echo !empty($wo['hf_free_pro']) ? 'hf-free-pro ' : ''; ?>hf-p-<?php echo Wo_Secure(is_string($wo['page']) ? $wo['page'] : ''); ?>" data-hf-page="<?php echo Wo_Secure(is_string($wo['page']) ? $wo['page'] : ''); ?>" <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>
       <input type="hidden" id="get_no_posts_name" value="<?php echo($wo['lang']['no_more_posts']); ?>">
     <?php $loadPage = Wo_LoadPage('thirdparty/theme-changer'); echo (!empty($loadPage)) ? $loadPage : '';?>
     <div id="focus-overlay"></div>
@@ -1748,7 +1756,7 @@
 
       <?php if ($wo['page'] != 'welcome' && $wo['loggedin'] == true) { ?>
       <?php echo Wo_LoadPage('hf/tabbar'); ?>
-      <script>window.hfCfg = <?php echo json_encode(array('home' => $wo['config']['site_url'], 'createPost' => !empty($wo['lang']['create_post']) ? $wo['lang']['create_post'] : 'Create post', 'notifications' => !empty($wo['lang']['notifications']) ? $wo['lang']['notifications'] : 'Notifications')); ?>;</script>
+      <script>window.hfCfg = <?php echo json_encode(array('home' => $wo['config']['site_url'], 'createPost' => !empty($wo['lang']['create_post']) ? $wo['lang']['create_post'] : 'Create post', 'notifications' => !empty($wo['lang']['notifications']) ? $wo['lang']['notifications'] : 'Notifications', 'settings' => !empty($wo['lang']['setting']) ? $wo['lang']['setting'] : 'Settings')); ?>;</script>
       <script src="<?php echo $wo['config']['theme_url'];?>/javascript/hf-ui.js?hf=<?php echo filemtime(__DIR__ . '/../javascript/hf-ui.js'); ?>"></script>
       <script>window.hf_more_label=<?php echo json_encode(!empty($wo['lang']['see_more']) ? $wo['lang']['see_more'] : 'See more'); ?>;window.hf_less_label=<?php echo json_encode(!empty($wo['lang']['see_less']) ? $wo['lang']['see_less'] : 'See less'); ?>;</script>
       <?php } ?>

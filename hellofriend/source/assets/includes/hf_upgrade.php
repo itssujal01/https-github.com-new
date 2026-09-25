@@ -3,7 +3,7 @@
 // new files are uploaded. Each step is safe to run again. The version stored in
 // Wo_Config (hf_version) makes sure the whole thing only runs once per release.
 
-define('HF_VERSION', '4.0.0');
+define('HF_VERSION', '4.1.0');
 
 function hf_upgrade_log($msg)
 {
@@ -136,7 +136,12 @@ function hf_upgrade_run()
         hf_upgrade_rrmdir($root . '/' . $d);
     }
 
-    // 4. drop cached copies so every page is rebuilt with the new code
+    // 4. make sure the admin panel has its own private address on this server
+    if (function_exists('hf_admin_slug')) {
+        hf_admin_slug();
+    }
+
+    // 5. drop cached copies so every page is rebuilt with the new code
     if (function_exists('hf_lang_cache_clear')) {
         hf_lang_cache_clear();
     }

@@ -39,6 +39,23 @@
     decorateComposer();
     pendingCompose();
     messagesStart(page);
+    settingsStart(page);
+  }
+  // phones: Settings shows the list first; tapping an item shows only that form, with a Back button
+  function settingsStart(page) {
+    body.classList.remove('hf-set-list', 'hf-set-detail');
+    if (page !== 'setting' || !phone.matches || !document.getElementById('wo_main_sett_side')) { return; }
+    var detail = /[?&]page=/.test(location.search) || /\/setting\/[^\/?#]+/.test(location.pathname);
+    body.classList.add(detail ? 'hf-set-detail' : 'hf-set-list');
+    var mid = document.getElementById('wo_main_sett_mid');
+    if (detail && mid && !mid.querySelector('.hf-back')) {
+      var b = document.createElement('a');
+      b.className = 'hf-back';
+      b.href = (cfg.home || '') + '/setting';
+      b.setAttribute('data-ajax', '?link1=setting');
+      b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>' + (cfg.settings || 'Settings');
+      mid.insertBefore(b, mid.firstChild);
+    }
   }
   // phones: Messages opens on the conversation list (WoWonder opened an empty chat pane over it)
   function messagesStart(page) {
@@ -82,7 +99,7 @@
     var li = $('#head_menu_rght > li.notification-container');
     if (!li.length) { return; }
     var menu = li.children('.dropdown-menu');
-    if (!menu.children('.hf-dd-title').length) { menu.prepend($('<li class="hf-dd-title"></li>').text(cfg.notifications || 'Notifications')); }
+    if (!menu.children('.hf-dd-title').length) { var t = $('<li class="hf-dd-title"><span></span><button type="button" class="hf-icon-btn" data-hf-close aria-label="Close"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></li>'); t.children('span').text(cfg.notifications || 'Notifications'); menu.prepend(t); }
     if (li.hasClass('open')) { closeAll(); return; }
     closeAll(true);
     li.children('.dropdown-toggle').trigger('click');
@@ -304,6 +321,20 @@
     $(document).on('click', '[data-hf-close], #hf-scrim', function (e) { e.preventDefault(); closeAll(); });
     $(document).on('click', '#hf-tab-bell', function (e) { e.preventDefault(); e.stopPropagation(); openBell(this); });
     $(document).on('click', '[data-hf-compose]', function (e) { e.preventDefault(); compose(this.getAttribute('data-hf-compose')); });
+    // phones: the header search icon opened a search box that is hidden there; go to Search instead
+    $(document).on('click', '.wow_new_search_bbtn > a', function (e) {
+      if (!phone.matches) { return; }
+      e.preventDefault(); e.stopImmediatePropagation();
+      var link = $('<a data-ajax="?link1=search"></a>').attr('href', (cfg.home || '') + '/search').appendTo(body);
+      link.trigger('click');
+      setTimeout(function () { link.remove(); }, 0);
+    });
+    // comments open with a small slide; the count row opens them too
+    $(document).on('click', '#wo_post_stat_button [onclick^="Wo_ShowComments"], .post-description .stats [onclick^="Wo_ShowComments"]', function () {
+      var id = (this.getAttribute('onclick').match(/\d+/) || [])[0];
+      var box = id && document.getElementById('post-comments-' + id);
+      if (box && !box.classList.contains('hidden')) { box.classList.remove('hf-open-anim'); void box.offsetWidth; box.classList.add('hf-open-anim'); }
+    });
     // the composer turns full screen on focus, which moves it under the finger before the tap
     // finishes; make sure WoWonder's own "open composer" step still runs
     $(document).on('focusin', '#publisher-box-focus .postText', function () {

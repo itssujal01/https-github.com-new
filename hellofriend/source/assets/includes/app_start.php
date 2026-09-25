@@ -363,26 +363,44 @@ if (!empty($_GET["mode"])) {
 include_once "assets/includes/onesignal_config.php";
 
 // manage packages
-$wo["pro_packages"]       = Wo_GetAllProInfo();
-try {
-    $wo["genders"]             = Wo_GetGenders($wo["language"], $langs);
-    $wo["page_categories"]     = Wo_GetCategories(T_PAGES_CATEGORY);
-    $wo["group_categories"]    = Wo_GetCategories(T_GROUPS_CATEGORY);
-    $wo["blog_categories"]     = Wo_GetCategories(T_BLOGS_CATEGORY);
-    $wo["products_categories"] = Wo_GetCategories(T_PRODUCTS_CATEGORY);
-    $wo["job_categories"]      = Wo_GetCategories(T_JOB_CATEGORY);
-    $wo["reactions_types"]     = Wo_GetReactionsTypes();
+// hellofriend: these lists (packages, genders, categories, reactions) hardly ever change but were
+// read from MySQL on every request, including every like and every notification poll.
+// Keep them on disk for 10 minutes; any admin change clears the copy (xhr/admin_setting.php).
+$hf_boot_key = 'boot_' . preg_replace('/[^a-z0-9_]/i', '', (string) $wo["language"]);
+$hf_boot = function_exists('hf_lang_cache_get') ? hf_lang_cache_get($hf_boot_key) : null;
+if (is_array($hf_boot) && isset($hf_boot['pro_packages'])) {
+    foreach ($hf_boot as $hf_k => $hf_v) {
+        $wo[$hf_k] = $hf_v;
+    }
+} else {
+    $wo["pro_packages"]       = Wo_GetAllProInfo();
+    try {
+        $wo["genders"]             = Wo_GetGenders($wo["language"], $langs);
+        $wo["page_categories"]     = Wo_GetCategories(T_PAGES_CATEGORY);
+        $wo["group_categories"]    = Wo_GetCategories(T_GROUPS_CATEGORY);
+        $wo["blog_categories"]     = Wo_GetCategories(T_BLOGS_CATEGORY);
+        $wo["products_categories"] = Wo_GetCategories(T_PRODUCTS_CATEGORY);
+        $wo["job_categories"]      = Wo_GetCategories(T_JOB_CATEGORY);
+        $wo["reactions_types"]     = Wo_GetReactionsTypes();
+    }
+    catch (Exception $e) {
+        $wo["genders"]             = array();
+        $wo["page_categories"]     = array();
+        $wo["group_categories"]    = array();
+        $wo["blog_categories"]     = array();
+        $wo["products_categories"] = array();
+        $wo["job_categories"]      = array();
+        $wo["reactions_types"]     = array();
+    }
+    Wo_GetSubCategories();
+    if (function_exists('hf_lang_cache_put')) {
+        $hf_boot = array();
+        foreach (array('pro_packages', 'genders', 'page_categories', 'group_categories', 'blog_categories', 'products_categories', 'job_categories', 'reactions_types', 'page_sub_categories', 'group_sub_categories', 'products_sub_categories') as $hf_k) {
+            $hf_boot[$hf_k] = isset($wo[$hf_k]) ? $wo[$hf_k] : array();
+        }
+        hf_lang_cache_put($hf_boot_key, $hf_boot);
+    }
 }
-catch (Exception $e) {
-    $wo["genders"]             = array();
-    $wo["page_categories"]     = array();
-    $wo["group_categories"]    = array();
-    $wo["blog_categories"]     = array();
-    $wo["products_categories"] = array();
-    $wo["job_categories"]      = array();
-    $wo["reactions_types"]     = array();
-}
-Wo_GetSubCategories();
 $wo["config"]["currency_array"]        = (array) json_decode($wo["config"]["currency_array"]);
 $wo["config"]["currency_symbol_array"] = (array) json_decode($wo["config"]["currency_symbol_array"]);
 $wo["config"]["providers_array"]       = (array) json_decode($wo["config"]["providers_array"]);

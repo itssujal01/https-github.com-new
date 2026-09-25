@@ -44,7 +44,6 @@ $wo["site_pages"]         = array(
     "password-reset",
     "admin-cp",
     "admincp",
-    "hf-studio-52wi3bt9",
     "adminPages",
     "start-up",
     "activated",

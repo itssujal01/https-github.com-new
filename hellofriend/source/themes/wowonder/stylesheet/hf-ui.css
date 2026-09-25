@@ -19,7 +19,7 @@
   --hf-grad-soft:linear-gradient(135deg,rgba(91,69,245,.12),rgba(245,71,154,.12));
   --hf-tint:#5B45F5; --hf-tint-press:#4A34E6; --hf-tint-soft:rgba(91,69,245,.10); --hf-tint-text:#4F39EC;
   --hf-bg:#F3F4F8; --hf-card:#FFFFFF; --hf-elev:#FFFFFF; --hf-fill:#EEF0F5; --hf-fill-2:#F5F6FA; --hf-fill-3:#E4E7EF;
-  --hf-sep:rgba(20,22,40,.08); --hf-text:#10121A; --hf-text-2:#5E6475; --hf-text-3:#9AA0AE;
+  --hf-sep:rgba(20,22,40,.08); --hf-text:#10121A; --hf-text-2:#5E6475; --hf-text-3:#80869A;
   --hf-red:#FF3B5C; --hf-green:#17B26A; --hf-orange:#FF8A00; --hf-blue:#2E7CF6;
   --hf-glass:rgba(255,255,255,.78); --hf-glass-line:rgba(255,255,255,.6);
   --hf-sh-1:0 1px 2px rgba(16,18,26,.04),0 1px 1px rgba(16,18,26,.03);
@@ -192,7 +192,7 @@ html body.hf-app .wo_page_hdng_innr>span svg path{fill:#fff}
 /* pill tabs used across directory pages */
 html body.hf-app :is(.wo_my_pages,.wow_content)>.nav,html body.hf-app ul.nav.nav-tabs,html body.hf-app .wo_page_hdng+.wow_content .nav{border:0!important;display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px!important}
 html body.hf-app ul.nav.nav-tabs>li>a,html body.hf-app :is(.wo_my_pages,.wow_content)>.nav>li>a{border:0!important;border-radius:999px!important;padding:8px 16px!important;background:var(--hf-fill-2)!important;color:var(--hf-text-2)!important;font-weight:600;white-space:nowrap;transition:background .2s,color .2s}
-html body.hf-app ul.nav.nav-tabs>li.active>a,html body.hf-app :is(.wo_my_pages,.wow_content)>.nav>li.active>a{background:var(--hf-text)!important;color:var(--hf-card)!important}
+html body.hf-app ul.nav.nav-tabs>li.active>a,html body.hf-app :is(.wo_my_pages,.wow_content)>.nav>li.active>a{background:var(--hf-grad)!important;color:#fff!important;box-shadow:var(--hf-sh-brand)}
 html body.hf-app ul.nav.nav-tabs>li>a::after,html body.hf-app .nav>li.active>a::after{display:none!important}
 
 /* ---------- 6. stories rail ---------- */
@@ -607,7 +607,7 @@ html.hf-dark body.hf-app .form-control{background:var(--hf-fill)!important;color
 
 /* composer + dropdown titles */
 html body.hf-app .sun_pub_box textarea.postText:focus-visible{outline:none!important}
-.hf-dd-title{font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--hf-text);padding:2px 10px 10px;list-style:none}
+.hf-dd-title{display:flex;align-items:center;justify-content:space-between;font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--hf-text);padding:2px 10px 10px;list-style:none}
 html body.hf-app .notifications-dropdown .turn-off-sound{display:inline-flex!important;margin:0 8px 8px;border-radius:999px!important;background:var(--hf-fill-2)!important;color:var(--hf-text-2)!important;font-size:13px;font-weight:600;padding:6px 12px!important}
 html body.hf-app .notifications-dropdown .turn-off-sound span{color:inherit!important}
 html body.hf-app .notifications-dropdown .turn-off-sound svg{width:16px;height:16px}
@@ -638,7 +638,7 @@ html body.hf-app.pub-focus .sun_pub_mid_foot .poster-left-buttons:has(.btn.mor){
 /* hero pages: the filter/plan cards used to be pulled up over the banner */
 html body.hf-app .wo_job_head_filter,html body.hf-app .wow_price_plans,html body.hf-app .wo_market_head_filter{margin-top:0!important;top:auto!important}
 html body.hf-app .wo_job_head_filter{border-radius:var(--hf-r)!important;padding:4px 8px!important;margin-bottom:12px!important}
-html body.hf-app .wo_job_head_filter>.wo_job_main_widget .m_widget_head,html body.hf-app .wo_job_head_filter .btn{border-radius:14px!important;border:0!important;background:var(--hf-fill-2)!important;font-family:var(--hf-font)!important}
+html body.hf-app .wo_job_head_filter>.wo_job_main_widget .m_widget_head,html body.hf-app .wo_job_head_filter .btn:not(.btn-main){border-radius:14px!important;border:0!important;background:var(--hf-fill-2)!important;font-family:var(--hf-font)!important}
 html body.hf-app .wow_main_float_head .wo_page_hdng,html body.hf-app .wow_main_float_head+.wo_page_hdng{margin-top:0!important}
 html body.hf-app .wow_main_float_head>.container>*:not(svg):not(h1):not(p){position:relative!important;top:auto!important;right:auto!important}
 html body.hf-app .movies .wow_main_float_head svg[style*="position"],html body.hf-app .wow_main_float_head .movies_head_img{display:none!important}
@@ -680,7 +680,7 @@ html body.hf-app .wo_user_profile .user-bottom-nav>ul>li{flex:none;float:none!im
 html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a{display:flex!important;flex-direction:row!important;align-items:center;gap:6px;padding:9px 16px!important;border-radius:999px!important;background:var(--hf-card)!important;box-shadow:var(--hf-sh-1);color:var(--hf-text-2)!important;font-weight:700!important;font-size:14px!important;white-space:nowrap;border:0!important}
 html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a svg{width:17px!important;height:17px!important;margin:0!important}
 html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a .split-link{display:none}
-html body.hf-app .wo_user_profile .user-bottom-nav>ul>li.active>a,html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a.active{background:var(--hf-text)!important;color:var(--hf-card)!important}
+html body.hf-app .wo_user_profile .user-bottom-nav>ul>li.active>a,html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a.active{background:var(--hf-grad)!important;color:#fff!important}
 html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a::after,html body.hf-app .wo_user_profile .user-bottom-nav>ul>li>a::before{display:none!important}
 @media (max-width:767px){
   html body.hf-app .wo_user_profile{margin:-10px -10px 0!important}
@@ -764,3 +764,107 @@ html body.hf-app .modal .wow_form_fields input,html body.hf-app .modal .wow_form
 html body.hf-app .modal .wow_form_fields input:focus,html body.hf-app .modal .wow_form_fields textarea:focus,html body.hf-app .modal .wow_form_fields select:focus{border-color:var(--hf-tint)!important;background:var(--hf-card)!important;box-shadow:0 0 0 4px var(--hf-tint-soft)!important}
 html body.hf-app .wow_form_fields label{color:var(--hf-text-2)!important;font-weight:700!important;font-size:13px!important}
 html body.hf-app .wow_form_fields input,html body.hf-app .wow_form_fields select,html body.hf-app .wow_form_fields textarea{border-radius:14px!important;border:1.5px solid var(--hf-sep)!important;background:var(--hf-fill-2)!important;color:var(--hf-text)!important;box-shadow:none!important}
+
+/* ---------- lists: groups / pages / people as tidy rows ---------- */
+html body.hf-app .wow_my_groups{display:flex!important;align-items:center;gap:14px;padding:12px!important;margin-bottom:10px!important;border-radius:20px!important;animation:hfFadeUp .35s var(--hf-ease) both}
+html body.hf-app .wow_my_groups>.avatar{flex:none;width:64px!important;height:64px!important;margin:0!important;border-radius:18px;overflow:hidden;position:static!important}
+html body.hf-app .wow_my_groups>.avatar img{width:100%!important;height:100%!important;object-fit:cover;border-radius:18px!important;margin:0!important;position:static!important}
+html body.hf-app .wow_my_groups_info{flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;grid-template-areas:"t b" "m b";align-items:center;column-gap:10px;padding:0!important;text-align:left!important;position:static!important}
+html body.hf-app .wow_my_groups_info .page_title{grid-area:t;margin:0!important;font-size:16px!important;font-weight:800!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body.hf-app .wow_my_groups_info .page_title a{color:var(--hf-text)!important}
+html body.hf-app .wow_my_groups_info>p{grid-area:m;margin:2px 0 0!important;color:var(--hf-text-2)!important;font-size:13.5px}
+html body.hf-app .wow_my_groups_info>.btn,html body.hf-app .wow_my_groups_info>span>.btn,html body.hf-app .wow_my_groups_info>div>.btn{grid-area:b;height:36px;padding:0 14px!important;font-size:13.5px!important;font-weight:700!important}
+@media (max-width:767px){html body.hf-app .profile-lists>.row>[class*="col-"]{width:100%!important;float:none!important}}
+html body.hf-app .wo_my_pages .page_list{display:flex!important;align-items:center;gap:12px;padding:12px!important;border-radius:20px!important;background:var(--hf-card)!important;margin-bottom:10px;box-shadow:var(--hf-sh-1)}
+html body.hf-app .wo_my_pages .page_list .info{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+html body.hf-app .wo_my_pages .page_list img{width:56px!important;height:56px!important;border-radius:16px!important;object-fit:cover}
+html body.hf-app .wo_my_pages .page_list .btns .btn{border-radius:999px!important}
+html body.hf-app .wow_my_groups{height:auto!important;min-height:0!important}
+html body.hf-app .wow_my_groups>.avatar>a{display:block;width:100%;height:100%}
+html body.hf-app .wow_my_groups>.avatar img{display:block}
+
+/* settings on phones: a list first, then one form at a time (hf-ui.js adds the classes) */
+@media (max-width:767px){
+  body.hf-set-list #wo_main_sett_mid{display:none!important}
+  body.hf-set-detail #wo_main_sett_side{display:none!important}
+  html body.hf-app .wow_sett_sidebar{padding:6px!important}
+  html body.hf-app .wow_sett_sidebar ul li a{border-radius:14px!important;padding:12px 12px!important;font-weight:600;display:flex!important;align-items:center;gap:12px}
+  html body.hf-app .wow_sett_sidebar ul li a::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--hf-text-3);border-top:2px solid var(--hf-text-3);transform:rotate(45deg)}
+  html body.hf-app .wow_sett_sidebar ul li.active a,html body.hf-app .wow_sett_sidebar ul li a.active{background:transparent!important;border:0!important;box-shadow:none!important;font-weight:600!important;color:var(--hf-text)!important}
+  .hf-back{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--hf-card);color:var(--hf-text);font-weight:700;font-size:15px;padding:9px 14px 9px 10px;border-radius:999px;box-shadow:var(--hf-sh-1);margin:0 0 12px}
+}
+html body.hf-app .wo_settings_page .avatar-holder{border:0!important;border-radius:20px!important;background:var(--hf-grad-soft)!important;padding:16px!important}
+html body.hf-app .wo_settings_page{padding:16px!important}
+@media (max-width:767px){
+  html body.hf-app .wo_settings_page{margin-top:0!important}
+  html body.hf-app .wow_sett_sidebar ul li,html body.hf-app .wow_sett_sidebar ul li.active{border:0!important;box-shadow:none!important;background:transparent!important}
+  html body.hf-app .wow_sett_sidebar ul li a:focus{outline:0}
+  html body.hf-app #wo_main_sett_side,html body.hf-app #wo_main_sett_mid{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
+}
+html body.hf-app .wow_my_groups>.avatar{padding:0!important}
+.hf-open-anim{animation:hfFadeUp .3s var(--hf-ease) both}
+html.hf-dark body.hf-app .wow_home_stories .status-list>li.view-more-stories{background:var(--hf-elev)!important}
+/* heading/tab wrappers that are themselves cards: keep one card only */
+html body.hf-app .wow_content:has(>.wo_page_hdng.pag_neg_padd){background:transparent!important;box-shadow:none!important;padding:0!important;margin-bottom:0!important}
+html body.hf-app .wow_content>.wo_page_hdng.pag_neg_padd{margin:0 0 12px!important}
+html body.hf-app .wow_main_float_head input::placeholder,html body.hf-app .wow_form_fields input::placeholder,html body.hf-app .wow_form_fields textarea::placeholder{color:var(--hf-text-3)!important;opacity:1}
+html body.hf-app .wow_main_float_head{padding-bottom:22px!important;min-height:0!important}
+html body.hf-app .how_many_reacts{color:var(--hf-text-2)!important;font-weight:600}
+html body.hf-app .online-text{color:#16803C!important;font-weight:700}
+html.hf-dark body.hf-app .online-text{color:#4ADE80!important}
+/* no sideways drift on phones (closed header dropdowns were widening the page) */
+html,html body.hf-app{overflow-x:clip!important}
+@media (max-width:767px){html body.hf-app .header-container .dropdown:not(.open)>.dropdown-menu{display:none!important}}
+/* group / page header panel */
+html body.hf-app .wo_group_profile .side_panel,html body.hf-app .wo_page_profile .side_panel{background:var(--hf-card)!important;color:var(--hf-text)!important;border:0!important}
+html body.hf-app .side_panel .info .title a{color:var(--hf-text)!important;font-weight:800!important;letter-spacing:-.02em}
+html body.hf-app .side_panel .info span{color:var(--hf-text-2)!important}
+html body.hf-app .side_panel .options-buttons{display:flex!important;flex-wrap:wrap;justify-content:center;gap:8px}
+html body.hf-app .side_panel .options-buttons .btn{display:inline-flex!important;align-items:center;gap:6px;height:40px;padding:0 18px!important;border-radius:999px!important;border:0!important;background:var(--hf-fill)!important;color:var(--hf-text)!important;font-weight:700!important;box-shadow:none!important}
+html body.hf-app .side_panel .options-buttons .btn svg{width:17px;height:17px}
+html body.hf-app .side_panel .options-buttons .btn-main,html body.hf-app .side_panel .options-buttons .btn-active{background:var(--hf-grad)!important;color:#fff!important}
+/* every plain field (search filters and similar) follows the theme */
+html.hf-dark body.hf-app #contnet :is(input[type=text],input[type=search],input[type=email],input[type=number],input[type=tel],input[type=url],input[type=password],input:not([type]),select):not(.hf-keep){background-color:var(--hf-fill)!important;color:var(--hf-text)!important;border-color:transparent!important}
+html body.hf-app #contnet input::placeholder{color:var(--hf-text-3)!important;opacity:1}
+/* page profile header on phones: centred like the group header */
+@media (max-width:767px){
+  html body.hf-app .wo_page_profile .page-info-cont{background:var(--hf-card)!important;margin:0 0 12px!important;padding:0 16px 16px!important;border-radius:0 0 var(--hf-r-lg) var(--hf-r-lg)!important;box-shadow:var(--hf-sh-1)!important;border:0!important}
+  html body.hf-app .wo_page_profile .page-info-cont .first_row{display:flex!important;flex-direction:column;align-items:center;text-align:center;padding:0!important;margin-top:-44px}
+  html body.hf-app .wo_page_profile .page-info-cont .user-avatar{position:relative!important;width:96px!important;height:96px!important;margin:0 auto 8px!important;border-radius:28px!important;border:4px solid var(--hf-card)!important;box-shadow:var(--hf-sh-2);overflow:hidden;top:auto!important;left:auto!important}
+  html body.hf-app .wo_page_profile .page-info-cont .user-avatar img{width:100%!important;height:100%!important;border-radius:0!important;object-fit:cover}
+  html body.hf-app .wo_page_profile .page-info-cont .info,html body.hf-app .wo_page_profile .page-info-cont .info .title{width:100%!important;padding:0!important;margin:0!important;position:static!important;height:auto!important;text-align:center!important}
+  html body.hf-app .wo_page_profile .page-info-cont .info .title>a{font-size:22px!important;font-weight:800!important;color:var(--hf-text)!important;letter-spacing:-.02em}
+  html body.hf-app .wo_page_profile .page_username{color:var(--hf-text-2)!important;margin:2px 0 12px!important}
+  html body.hf-app .wo_page_profile .options-buttons{display:flex!important;flex-wrap:wrap;justify-content:center;gap:8px;position:static!important}
+  html body.hf-app .wo_page_profile .options-buttons .btn{display:inline-flex!important;align-items:center;gap:6px;height:40px;padding:0 16px!important;border-radius:999px!important;border:0!important;background:var(--hf-fill)!important;color:var(--hf-text)!important;font-weight:700!important;margin:0!important;box-shadow:none!important}
+  html body.hf-app .wo_page_profile .options-buttons .btn-main,html body.hf-app .wo_page_profile .options-buttons .btn-active{background:var(--hf-grad)!important;color:#fff!important}
+  html body.hf-app .wo_page_profile .last_row{padding:12px 0 0!important;text-align:center}
+  html body.hf-app .wo_page_profile .page_info,html body.hf-app .wo_page_profile .page_info *{color:var(--hf-text-2)!important}
+}
+@media (max-width:767px){
+  html body.hf-app .wo_page_profile .page_navbar{background:transparent!important;border:0!important;margin:14px -4px 0!important;padding:0!important}
+  html body.hf-app .wo_page_profile .page_navbar ul{display:flex!important;flex-wrap:nowrap;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0!important;padding:0 4px!important;justify-content:flex-start}
+  html body.hf-app .wo_page_profile .page_navbar li{flex:none;float:none!important;list-style:none}
+  html body.hf-app .wo_page_profile .page_navbar li a{display:inline-flex!important;align-items:center;gap:6px;height:38px;padding:0 14px!important;border-radius:999px!important;background:var(--hf-fill)!important;color:var(--hf-text)!important;font-weight:650;font-size:13.5px;white-space:nowrap;text-decoration:none}
+  html body.hf-app .wo_page_profile .page_navbar li a svg{width:16px;height:16px}
+  html body.hf-app .wo_page_profile .last_row{padding-top:8px!important}
+}
+/* chat bubbles: one clean bubble, no ring from the wrapper */
+html body.hf-app .messages-wrapper .message{background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important}
+html body.hf-app #wo_nw_msg_page .messages-wrapper.pull-left .message-text,html body.hf-app .messages-wrapper.pull-left .message-text{background:var(--hf-fill)!important;color:var(--hf-text)!important}
+html body.hf-app .messages-wrapper.pull-right .message-text,html body.hf-app .outgoing .messages-wrapper .message-text{background:var(--hf-grad)!important;color:#fff!important}
+html body.hf-app .messages-load-more-messages{position:relative!important;top:auto!important;left:auto!important;transform:none!important;margin:6px auto 10px!important;width:max-content;background:transparent!important;list-style:none;display:block}
+html body.hf-app .messages-load-more-messages a{display:inline-flex!important;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%!important;background:var(--hf-fill)!important;color:var(--hf-text)!important}
+html body.hf-app #wo_msg_right_prt .msg_usr_info_top_list,html body.hf-app #wo_msg_right_prt .msg_usr_info_top_list a{background:transparent!important}
+html body.hf-app .msg_usr_cht_usr_data{min-width:0;flex:1}
+html body.hf-app .msg_usr_cht_usr_data #user-name,html body.hf-app .msg_usr_cht_usr_data #user-name a{max-width:none!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--hf-text)!important}
+/* an opened comment box without comments yet should not leave a tall gap */
+html body.hf-app .post-comments .comments-list:empty,html body.hf-app .post-comments .comments-list:not(:has(*)){min-height:0!important;padding:0!important;margin:0!important}
+/* active tab pills use the brand gradient everywhere */
+html body.hf-app .nav-tabs>li.active>a,html body.hf-app .nav-tabs>li.active>a:hover,html body.hf-app .nav-tabs>li.active>a:focus,html body.hf-app .wow_srch_tabs li.active .btn,html body.hf-app .wo_msg_tabs li.active a{background:var(--hf-grad)!important;color:#fff!important;border:0!important;box-shadow:var(--hf-sh-brand)!important}
+html body.hf-app .nav-tabs>li.active>a svg,html body.hf-app .wo_msg_tabs li.active a svg{color:#fff!important;fill:currentColor}
+html body.hf-app .wow_srch_tabs li .btn{letter-spacing:0!important;text-transform:none!important}
+html body.hf-app .dropdown-menu>li.hf-dd-title{display:flex!important;align-items:center;justify-content:space-between;width:100%}
+html body.hf-app .dropdown-menu>li.hf-dd-title .hf-icon-btn{margin-left:auto;flex:none}
+/* comment reaction pill only when it has reactions */
+html body.hf-app .comment .like-stat.post-like-status:not(:has(.like-emo *)){display:none!important}
